@@ -17,131 +17,85 @@ class MovieData
   def hash_user()
     @current_file.each do |line| #adding the info to hash
       curr = line.split
-      #puts curr[0]
+      #hash users
       if @file_hash.has_key?(curr[0])
         for a in 1..2 do
           @file_hash[curr[0]].append curr[a] #append movie rating and movie_id
         end
       else
-        #puts curr[0]
         @file_hash[curr[0]] = [curr[1],curr[2]]
-        #puts "hi"
-        #puts @file_hash[curr[0]]
+      end
+
+      #hash movies
+      if @movie_hash.has_key?(curr[1])
+        @movie_hash[curr[1]].append curr[0] #append user and their movie ratings
+        @movie_hash[curr[1]].append curr[2]
+      else
+        @movie_hash[curr[1]] = [curr[0],curr[2]]
       end
     end
   end
-
 
   #returns an integer from 1 to 5 to indicate the popularity of a certain movie.
   def popularity(movie_id)
+    rate_count = 1
+    popular_rate = 0
+    unless @movie_hash.has_key?(movie_id)
+      return 1
+    end
+    until rate_count >= @movie_hash[movie_id].size-1
+      popular_rate += @movie_hash[movie_id][rate_count].to_i
+      rate_count +=2
+    end
+    if rate_count <2
+      return 1
+    end
+    popular_rate = popular_rate /(rate_count/2)
+    return popular_rate
   end
-
-  # this is for the non-hashed version
-  #   num = 0
-  #   count = 0
-  #   @filelist.each do |line|
-  #     curr = line.split
-  #     if curr[1]== movie_id
-  #       num +=curr[2].to_i
-  #       count+=1
-  #     end
-  #   end
-  #   if count!=0
-  #     return num/count
-  #   end
-  # end
 
   #this will generate a list of all movie_id's ordered by decreasing popularity
-  def popularity_list
-    movie = []
-    @filelist.each do |line|
-      curr = line.split
-      movie.append curr[3]
-    end
-    movie = movie.sort_by {|m| popularity(m)}
-    return movie
+  def popularity_list()
+    @movie_hash.keys.sort_by {|key| -popularity(key)}
   end
-
-  #generate first 10 of popularity
-  def popularity_list_frist_10
-    ans = []
-    count =0
-    @filelist.each do |line|
-      curr = line.split
-      while count < 10
-        if popularity(curr[3])!=nil && popularity(curr[3])>=4
-          ans.append curr[3]
-          puts curr[3]
-          count+=1
-        end
-      end
-    end
-    return ans
-  end
-
 
   #generates a number between 0 and 1 indicating the similarity in movie
   #preferences between user1 and user2. 0 is no similarity.
   def similarity(user1, user2)
-    puts @file_hash[user1]
-    puts @file_hash[user2]
-    "11"
+    similarity = []
+    a = 0
+    until a >= @file_hash[user1].size-1
+      b = 0
+      if @file_hash.has_key?(user2)
+        until b >= @file_hash[user2].size-1
+          if @file_hash[user1][a] == @file_hash[user2][b]
+            #the similarity is 1-(rating1-rating2)/5
+            score = ((@file_hash[user1][a+1].to_i - @file_hash[user2][b+1].to_i)/5).abs
+            similarity.append score
+          end
+          b+=2
+        end
+      end
+      a+=2
+    end
+    if similarity.size == 0
+      return 0
+    else
+      return similarity.sum(0.0) / similarity.size
+    end
   end
-  #   sim = 0
-  #   u1=[]
-  #   u2=[]
-  #   ans = []
-  #   count = 0
-  #   count1=0
-  #   moviec = 0
-  #   @filelist.each do |line|
-  #     curr = line.split
-  #     if curr[0]== user1
-  #       #add movie and rating to a list
-  #       u1.append curr[1] #movie_id
-  #       u1.append curr[2]
-  #       count+=1
-  #     end
-  #     if curr[0] == user2
-  #       #add movie and rating to a list
-  #       u2.append curr[1] #movie_id
-  #       u2.append curr[2]
-  #       count1+=1
-  #     end
-  #   end
-  #   for a in 0..count+1 do
-  #     if a%2==0
-  #       for b in 0..count1+1 do
-  #         if b%2==0 && u1[a]==u2[b]
-  #           moviec+=1
-  #           ans.append (u1[a+1].to_i/u2[b+1].to_i).abs
-  #         end
-  #       end
-  #     end
-  #   end
-  #   sim = ans.sum(0.0) / ans.size
-  #   return sim
-  # end
+
 
   #this return a list of users whose tastes are most similar to the tastes of
-  #user u
-  def most_similar(u)
-    # userlist = []
-    # @filelist.each do |line|
-    #   curr = line.split
-    #   if similarity(u, curr[0])==1.0 && curr[0] != u
-    #     userlist.append curr[0]
-    #   end
-    # end
-    # return userlist
-    ans = []
-    for a in 2..500 do
-      #puts similarity("1", a.to_s)
-      if similarity("1",a.to_s) ==1
-        ans.append a
+  #user, the score is how simiar do we want them to be
+  def most_similar(user, score)
+    user_list = []
+    for a in 0..@file_hash.size do
+      if similarity(user,a.to_s) >= score
+        user_list.append a
       end
     end
-    return ans
+    return user_list
   end
 
 
@@ -149,7 +103,9 @@ end
 
 #start irb
 #require_relative "/Users/marco/Desktop/rubylol/movie1/movie_data.rb"
-thing = MovieData.new()
-thing.hash_user()
-puts thing.file_hash["1"]
-#similarity("1", "3")
+# 
+# thing = MovieData.new()
+# thing.hash_user()
+# puts thing.most_similar("1", 0.8)
+# puts thing.popularity_list()[0..9]
+# puts thing.popularity_list()[1672..1681]

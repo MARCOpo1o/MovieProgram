@@ -1,80 +1,18 @@
-(base) marco@chromebookpro16 movie1 % ruby movie_data.rb
-puts thing.most_similar("1")
-2
-9
-19
-27
-31
-33
-35
-39
-41
-46
-47
-50
-52
-62
-66
-67
-72
-73
-86
-89
-107
-111
-123
-124
-129
-131
-135
-139
-140
-147
-158
-166
-172
-175
-185
-197
-199
-202
-204
-211
-230
-237
-243
-246
-252
-257
-260
-262
-278
-282
-289
-302
-304
-306
-309
-319
-329
-338
-350
-352
-364
-375
-383
-390
-408
-409
-418
-420
-426
-433
-439
-440
-443
-444
-456
-461
-465
-467
+
+irb(main):001:0> require_relative "/Users/marco/Desktop/rubylol/movie1/movie_dat
+a.rb"
+=> true
+irb(main):002:0> thing = MovieData.new()
+=>
+#<MovieData:0x00000001045055a0
+...
+irb(main):003:0> thing.hash_user()
+=> #<File:u.data>
+irb(main):004:0> thing.most_similar("1", 0.8)
+=> [88, 261, 317, 341, 510, 511, 631, 688, 729, 772, 808, 816]
+irb(main):005:0> thing.popularity_list()[0..9]
+=> ["1191", "1189", "1500", "1398", "1491", "1306", "1358", "1450", "1617", "1467"]
+irb(main):006:0> thing.popularity_list()[1672..1681]
+=> ["1412", "1635", "439", "1582", "1648", "1246", "1420", "1551", "1536", "1310"]
+irb(main):007:0> exit
+(base) marco@chromebookpro16 movie1 %
